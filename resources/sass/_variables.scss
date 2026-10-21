@@ -1,0 +1,61 @@
+// Brand
+$brand: #1f8a4f;
+$brand-dark: #14633a;
+$brand-soft: #e3f5ea;
+$ink: #17332a;
+$page-bg: #eef5f1;
+
+// Pastel tiles
+$tile-mint: #e3f5ea;
+$tile-sky: #e2effc;
+$tile-peach: #fdebd8;
+$tile-lilac: #ece5fb;
+$tile-rose: #fde5e9;
+$tile-sand: #fbf1d2;
+
+// Typography
+$font-family-sans-serif: 'Hind Siliguri', system-ui, -apple-system, 'Segoe UI', sans-serif;
+$font-size-base: 0.9375rem;
+$line-height-base: 1.55;
+$headings-font-weight: 600;
+$headings-color: $ink;
+
+// Colors
+$body-bg: $page-bg;
+$body-color: #33463e;
+$primary: $brand;
+$success: $brand;
+$info: #2f7fc1;
+$warning: #e0951f;
+$danger: #d6453a;
+$secondary: #6b7d75;
+
+// Shape (সব বেশি গোলাকার)
+$border-color: #e3ebe6;
+$border-radius: 0.75rem;
+$border-radius-sm: 0.5rem;
+$border-radius-lg: 1.125rem;
+
+// Buttons: pill
+$btn-border-radius: 50rem;
+$btn-border-radius-sm: 50rem;
+$btn-border-radius-lg: 50rem;
+$btn-padding-x: 1.15rem;
+$btn-font-weight: 500;
+
+// Cards, forms, others
+$card-border-width: 0;
+$card-border-radius: $border-radius-lg;
+$card-spacer-x: 1.25rem;
+$input-border-color: #d3ddd7;
+$input-border-radius: 0.75rem;
+$input-padding-y: 0.6rem;
+$input-focus-border-color: #5dbb87;
+$input-focus-box-shadow: 0 0 0 0.22rem rgba(31, 138, 79, 0.15);
+$form-label-font-weight: 500;
+$dropdown-border-radius: 0.9rem;
+$dropdown-border-color: $border-color;
+$alert-border-radius: 1rem;
+$table-cell-padding-y: 0.8rem;
+$table-cell-padding-x: 1rem;
+$table-border-color: $border-color;

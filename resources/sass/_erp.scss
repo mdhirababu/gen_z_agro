@@ -1,0 +1,1077 @@
+$shadow-card: 0 8px 28px rgba(23, 51, 42, 0.06);
+$shadow-lift: 0 12px 32px rgba(23, 51, 42, 0.12);
+
+:root {
+  --rail-w: 252px;
+  --rail-w-collapsed: 84px;
+}
+
+body { -webkit-font-smoothing: antialiased; }
+
+/* ================= Shell ================= */
+.app-shell {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  min-height: 100vh;
+  padding: 0.75rem;
+
+  @include media-breakpoint-down(lg) { display: block; padding: 0.5rem; }
+}
+
+.app-main { flex: 1; min-width: 0; }
+
+.app-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1045;
+  background: rgba(15, 40, 30, 0.45);
+
+  @include media-breakpoint-up(lg) { display: none !important; }
+}
+
+/* ================= Sidebar ================= */
+.app-sidebar {
+  flex: none;
+  position: sticky;
+  top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  width: var(--rail-w);
+  height: calc(100vh - 1.5rem);
+  padding: 1rem 0.85rem;
+  background: #fff;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-card;
+  transition: width 0.2s ease;
+
+  @include media-breakpoint-down(lg) {
+    position: fixed;
+    inset: 0.5rem auto 0.5rem 0.5rem;
+    z-index: 1050;
+    width: min(290px, 86vw);
+    height: auto;
+    transform: translateX(calc(-100% - 1rem));
+    transition: transform 0.2s ease;
+
+    &.is-open { transform: none; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-sidebar { transition: none; }
+}
+
+.sb-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.sb-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: $ink;
+  text-decoration: none;
+
+  strong { font-weight: 700; }
+}
+
+.app-logo {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.8rem;
+  background: $brand;
+  color: #fff;
+  font-weight: 700;
+}
+
+.farm-card {
+  margin: 0.25rem 0 0.75rem;
+  padding: 0.8rem 0.9rem;
+  border-radius: 1rem;
+  background: $brand-soft;
+
+  .farm-card-label { font-size: 0.75rem; color: $secondary; }
+  .farm-card-name { margin: 0.1rem 0 0.5rem; font-weight: 600; color: $ink; overflow-wrap: anywhere; }
+  .farm-card-meta { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.5rem; }
+  .farm-card-link { font-size: 0.8125rem; color: $brand-dark; font-weight: 500; text-decoration: none; &:hover { text-decoration: underline; } }
+}
+
+.sb-scroll { flex: 1; overflow-y: auto; margin: 0 -0.25rem; padding: 0 0.25rem; }
+
+.sb-title { margin: 1rem 0.6rem 0.35rem; font-size: 0.75rem; color: #8a9c93; }
+
+.sb-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.15rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.9rem;
+  color: #52665d;
+  font-weight: 500;
+  text-decoration: none;
+
+  i { flex: none; width: 1.4rem; text-align: center; font-size: 1.15rem; }
+
+  &:hover { background: $brand-soft; color: $brand-dark; }
+  &.active { background: $brand; color: #fff; box-shadow: 0 6px 14px rgba(31, 138, 79, 0.28); }
+
+  &.is-disabled {
+    opacity: 0.45;
+    cursor: default;
+    &:hover { background: transparent; color: #52665d; }
+  }
+
+  .soon {
+    margin-left: auto;
+    padding: 0 0.5rem;
+    border-radius: 50rem;
+    background: #eef2f0;
+    font-size: 0.68rem;
+    font-style: normal;
+  }
+}
+
+/* ছোট আইকন-রেল (শুধু বড় স্ক্রিনে) */
+@include media-breakpoint-up(lg) {
+  .app-shell.is-rail {
+    .app-sidebar { width: var(--rail-w-collapsed); padding-inline: 0.6rem; }
+    .sb-label, .farm-card, .sb-title, .soon { display: none; }
+    .sb-top { flex-direction: column; }
+    .sb-link { justify-content: center; padding: 0.75rem; }
+  }
+}
+
+/* ================= Header ================= */
+.app-header {
+  position: sticky;
+  top: 0.75rem;
+  z-index: 1020;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.7rem 1rem;
+  background: #fff;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-card;
+
+  @include media-breakpoint-down(lg) { top: 0.5rem; }
+
+  .crumbs { font-size: 0.78rem; color: $secondary; line-height: 1.2; }
+  .page-title { margin: 0; font-size: 1.15rem; line-height: 1.25; }
+}
+
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid $border-color;
+  border-radius: 50%;
+  background: #fff;
+  color: #43584e;
+
+  &:hover { background: $brand-soft; }
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.2rem 0.5rem 0.2rem 0.2rem;
+  border: 0;
+  border-radius: 50rem;
+  background: transparent;
+  color: inherit;
+
+  &:hover { background: #f1f6f3; }
+}
+
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 50%;
+  background: $tile-sky;
+  color: #2a6aa8;
+  font-weight: 700;
+}
+
+.app-content {
+  max-width: 1400px;
+
+  @include media-breakpoint-down(lg) { padding-bottom: 5.5rem; }
+}
+
+/* ================= Mobile bottom nav ================= */
+.bottom-nav {
+  position: fixed;
+  inset: auto 0.5rem 0.5rem;
+  z-index: 1030;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: 0.35rem;
+  background: #fff;
+  border-radius: 1.25rem;
+  box-shadow: $shadow-lift;
+
+  > a, > span, > button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+    padding: 0.45rem 0;
+    border: 0;
+    border-radius: 1rem;
+    background: transparent;
+    color: $secondary;
+    font-size: 0.7rem;
+    text-decoration: none;
+
+    i { font-size: 1.25rem; }
+  }
+
+  > a.active { background: $brand-soft; color: $brand; font-weight: 600; }
+  > .is-disabled { opacity: 0.4; }
+}
+
+/* ================= Cards & parts ================= */
+.card, .panel, .table-card, .stat, .kpi, .farm-tile {
+  background: #fff;
+  border: 0;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-card;
+}
+
+.panel { height: 100%; }
+.panel-head { padding: 1.1rem 1.25rem 0; font-weight: 600; font-size: 1.05rem; color: $ink; }
+.panel-body { padding: 1.1rem 1.25rem 1.25rem; }
+
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+
+  h1 { margin: 0; font-size: 1.375rem; }
+  p { margin: 0.15rem 0 0; color: $secondary; font-size: 0.875rem; }
+}
+
+/* গোল পেস্টেল আইকন ব্যাজ */
+.ic {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 2.7rem;
+  height: 2.7rem;
+  border-radius: 50%;
+  font-size: 1.2rem;
+
+  &.mint  { background: $tile-mint;  color: $brand-dark; }
+  &.sky   { background: $tile-sky;   color: #2a6aa8; }
+  &.peach { background: $tile-peach; color: #b8641a; }
+  &.lilac { background: $tile-lilac; color: #6a49b8; }
+  &.rose  { background: $tile-rose;  color: #c23a50; }
+  &.sand  { background: $tile-sand;  color: #9a7410; }
+}
+
+/* গ্রিটিং ব্যানার */
+.hero {
+  padding: 1.25rem;
+  border-radius: $border-radius-lg;
+  background: linear-gradient(120deg, #157a45 0%, #27a062 62%, #4bc08a 100%);
+  box-shadow: $shadow-card;
+  color: #fff;
+
+  h1 { margin: 0; color: #fff; font-size: 1.4rem; }
+  p { margin: 0.2rem 0 1rem; opacity: 0.92; }
+}
+
+.hero-strip {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.9rem;
+  padding: 0.9rem;
+  border-radius: 1rem;
+  background: #fff;
+  color: $ink;
+
+  @include media-breakpoint-up(md) { grid-template-columns: repeat(4, 1fr); }
+}
+
+.mini-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+
+  b { display: block; font-size: 1.2rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  small { color: $secondary; }
+}
+
+/* KPI: বাঁ দিকে রঙিন ধার */
+.kpi {
+  height: 100%;
+  padding: 1rem 1.15rem;
+  border-left: 4px solid $brand;
+
+  &.sky   { border-left-color: #4b9be0; }
+  &.lilac { border-left-color: #9a7bd8; }
+  &.peach { border-left-color: #f0a04b; }
+
+  .kpi-label { font-size: 0.85rem; color: $secondary; }
+  .kpi-value { font-size: 1.65rem; font-weight: 600; color: $ink; font-variant-numeric: tabular-nums; }
+  .kpi-note { font-size: 0.8rem; color: $secondary; }
+}
+
+/* পুরোনো stat কার্ড (আগের view-এর জন্য) */
+.stat {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  height: 100%;
+  padding: 1rem 1.125rem;
+
+  .stat-icon { display: grid; place-items: center; flex: none; width: 2.5rem; height: 2.5rem; border-radius: 50%; background: $tile-mint; color: $brand-dark; font-size: 1.15rem; }
+  .stat-label { font-size: 0.8125rem; color: $secondary; }
+  .stat-value { font-size: 1.5rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+}
+
+/* ট্যাগ: আউটলাইন (ছবি ১) ও নরম pill (ছবি ২) */
+.tag, .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.7rem;
+  border-radius: 50rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.tag { border: 1px solid currentColor; background: transparent; }
+.tag.green  { color: #2c8a4a; } .tag.blue   { color: #2f7fc1; }
+.tag.orange { color: #d98a14; } .tag.red    { color: #d6453a; }
+.tag.purple { color: #7a55c8; } .tag.gray   { color: #6b7d75; }
+.pill.green  { background: #dff3e6; color: #1f7a45; }
+.pill.blue   { background: #dcebfb; color: #256aa6; }
+.pill.orange { background: #fdeacf; color: #a8620d; }
+.pill.red    { background: #fde0dd; color: #b8352b; }
+.pill.purple { background: #e9e0fa; color: #6240b0; }
+.pill.gray   { background: #e9efec; color: #52665d; }
+
+/* আগের badge-গুলোও নরম pill হয়ে যাবে */
+.badge { padding: 0.4em 0.8em; border-radius: 50rem; font-weight: 600; }
+.badge.bg-success   { background-color: #dff3e6 !important; color: #1f7a45 !important; }
+.badge.bg-info      { background-color: #dcebfb !important; color: #256aa6 !important; }
+.badge.bg-warning   { background-color: #fdeacf !important; color: #a8620d !important; }
+.badge.bg-danger    { background-color: #fde0dd !important; color: #b8352b !important; }
+.badge.bg-secondary { background-color: #e9efec !important; color: #52665d !important; }
+
+.chip { padding: 0.1rem 0.6rem; border-radius: 50rem; background: #fff; font-size: 0.75rem; font-weight: 600; color: $brand-dark; }
+.chip-info { color: #256aa6; } .chip-warning { color: #a8620d; } .chip-danger { color: #b8352b; }
+
+/* ================= Tables ================= */
+.table-card { overflow: hidden; .table { margin: 0; } }
+
+.table {
+  font-variant-numeric: tabular-nums;
+
+  > thead > tr > th {
+    background: #f6faf7;
+    color: $secondary;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    white-space: nowrap;
+    border-bottom: 1px solid $border-color;
+  }
+}
+.table-hover > tbody > tr:hover > * {
+  --bs-table-bg-state: #f3f9f5;
+  --bs-table-hover-bg: #f3f9f5;
+}
+
+/* ================= Donut ও chart ================= */
+.donut {
+  --size: 9.5rem;
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+
+  &::after { content: ''; position: absolute; inset: 17%; border-radius: 50%; background: #fff; }
+
+  .donut-center {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    line-height: 1.15;
+
+    b { display: block; font-size: 1.3rem; color: $ink; }
+    small { color: $secondary; }
+  }
+}
+
+.legend {
+  flex: 1;
+  min-width: 9rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li { display: flex; align-items: center; gap: 0.5rem; padding: 0.22rem 0; font-size: 0.875rem; }
+  .dot { flex: none; width: 0.7rem; height: 0.7rem; border-radius: 50%; }
+}
+
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+
+  .grid { stroke: #e8eeea; stroke-width: 1; }
+  .axis { fill: #7a8c84; font-size: 10px; }
+  .line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+  .line-rev { stroke: $brand; }
+  .line-exp { stroke: #f0a04b; }
+}
+
+.dot-key { display: inline-block; width: 0.65rem; height: 0.65rem; margin-right: 0.35rem; border-radius: 50%; }
+
+/* ================= খামারের কার্ড ================= */
+.farm-tile {
+  display: flex;
+  gap: 0.9rem;
+  height: 100%;
+  padding: 1.1rem;
+  color: inherit;
+  text-decoration: none;
+
+  &:hover { box-shadow: $shadow-lift; color: inherit; }
+
+  .farm-avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 3.2rem;
+    height: 3.2rem;
+    border-radius: 1rem;
+    background: $tile-mint;
+    color: $brand-dark;
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  .farm-title { font-weight: 600; font-size: 1.05rem; color: $ink; }
+}
+
+.empty-state {
+  padding: 3rem 1rem;
+  text-align: center;
+
+  > i { font-size: 2rem; color: #8aa396; }
+  h2 { margin: 0.5rem 0 0.25rem; font-size: 1.125rem; }
+  p { margin-bottom: 1rem; color: $secondary; }
+}
+
+.todo-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li { display: flex; gap: 0.6rem; padding: 0.6rem 0; border-bottom: 1px solid $border-color; &:last-child { border-bottom: 0; } &.is-done i { color: $brand; } }
+}
+
+/* ================= Login / Register ================= */
+.auth-wrap {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 1rem;
+  background: $page-bg;
+}
+
+.auth-card {
+  display: grid;
+  width: 100%;
+  max-width: 1000px;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 1.5rem;
+  box-shadow: $shadow-lift;
+
+  @include media-breakpoint-up(lg) { grid-template-columns: 5fr 6fr; min-height: 36rem; }
+}
+
+.auth-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 1.75rem;
+  color: #fff;
+  background: linear-gradient(135deg, #126f3f 0%, #1f9a5c 60%, #46bd86 100%);
+
+  &::before, &::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.08); }
+  &::before { width: 16rem; height: 16rem; top: -5rem; right: -5rem; }
+  &::after { width: 11rem; height: 11rem; bottom: -4rem; left: -4rem; }
+  > * { position: relative; z-index: 1; }
+
+  .auth-brand { display: flex; align-items: center; gap: 0.7rem; font-size: 1.1rem; font-weight: 700; }
+  .app-logo { background: rgba(255, 255, 255, 0.2); }
+  h1 { margin: 1.25rem 0 0.5rem; color: #fff; font-size: 1.55rem; line-height: 1.3; }
+  p { max-width: 26rem; margin: 0; opacity: 0.92; }
+
+  .auth-points { display: none; margin: 1.75rem 0 0; padding: 0; list-style: none; }
+  .auth-points li { display: flex; align-items: center; gap: 0.75rem; padding: 0.45rem 0; }
+  .auth-points .pt { display: grid; place-items: center; flex: none; width: 2.2rem; height: 2.2rem; border-radius: 50%; background: rgba(255, 255, 255, 0.18); }
+
+  @include media-breakpoint-up(lg) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 3rem;
+
+    h1 { font-size: 1.9rem; }
+    .auth-points { display: block; }
+  }
+}
+
+.auth-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.75rem 1.25rem;
+
+  @include media-breakpoint-up(lg) { padding: 3rem; }
+
+  /* পাসওয়ার্ড রিসেটের মতো অন্য পেজগুলোর জন্য (এগুলো এখনো পুরোনো কাঠামোতে) */
+  .container { max-width: 30rem; padding: 0; }
+  .row > [class*='col-'] { flex: 0 0 100%; max-width: 100%; }
+  .card { background: transparent; box-shadow: none; }
+  .card-header { padding-left: 0; border: 0; background: transparent; font-size: 1.4rem; font-weight: 600; }
+}
+
+.auth-panel { width: 100%; max-width: 26rem; }
+.auth-title { margin: 0 0 0.25rem; font-size: 1.55rem; }
+.auth-sub { margin: 0 0 1.5rem; color: $secondary; }
+
+.field { margin-bottom: 1.1rem; }
+
+.field-control {
+  position: relative;
+
+  > i.lead-ic { position: absolute; top: 50%; left: 1rem; transform: translateY(-50%); color: #8a9c93; pointer-events: none; }
+
+  .form-control {
+    padding: 0.75rem 1rem 0.75rem 2.8rem;
+    background-color: #f7faf8;
+    border-color: #dbe5df;
+
+    &:focus { background-color: #fff; }
+    &.is-invalid { background-image: none; }
+  }
+
+  &.has-toggle .form-control { padding-right: 3rem; }
+
+  .toggle {
+    position: absolute;
+    top: 50%;
+    right: 0.4rem;
+    transform: translateY(-50%);
+    width: 2.2rem;
+    height: 2.2rem;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #8a9c93;
+
+    &:hover { background: $brand-soft; color: $brand-dark; }
+  }
+}
+
+.field-error { margin-top: 0.35rem; color: #b8352b; font-size: 0.82rem; }
+.field-hint { margin-top: 0.35rem; color: $secondary; font-size: 0.8rem; }
+
+.auth-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.auth-btn { width: 100%; padding: 0.8rem 1rem; font-weight: 600; }
+
+.auth-alt {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid $border-color;
+  text-align: center;
+  color: $secondary;
+
+  a { color: $brand-dark; font-weight: 600; text-decoration: none; &:hover { text-decoration: underline; } }
+}
+
+/* ================= পেমেন্ট যাচাই পেজ ================= */
+.min-w-0 { min-width: 0; }
+
+.kpi.rose { border-left-color: #e5707c; }
+
+/* ফিল্টার chip */
+.tab-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+
+.tab-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1rem;
+  border: 1px solid $border-color;
+  border-radius: 50rem;
+  background: #fff;
+  color: #52665d;
+  font-weight: 500;
+  text-decoration: none;
+
+  .count {
+    padding: 0 0.5rem;
+    border-radius: 50rem;
+    background: #eef2f0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &:hover { background: $brand-soft; color: $brand-dark; }
+
+  &.active {
+    border-color: $brand;
+    background: $brand;
+    color: #fff;
+
+    .count { background: rgba(255, 255, 255, 0.25); color: #fff; }
+  }
+}
+
+/* পেমেন্টের সারি */
+.pay-list { padding: 0; overflow: hidden; }
+
+.pay-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem 1rem;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid $border-color;
+
+  &:last-child { border-bottom: 0; }
+  &.is-pending { background: #fffdf7; box-shadow: inset 4px 0 0 #f0a04b; }
+
+  @include media-breakpoint-up(lg) {
+    grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1.2fr) auto;
+  }
+}
+
+.pay-amount { font-size: 1.2rem; font-weight: 600; color: $ink; font-variant-numeric: tabular-nums; }
+
+.pay-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  @include media-breakpoint-up(lg) { justify-content: flex-end; }
+}
+
+.copy-btn {
+  padding: 0.1rem 0.35rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: #8a9c93;
+
+  &:hover { background: $brand-soft; color: $brand-dark; }
+}
+
+/* নিশ্চিতকরণের পপ-আপ */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(15, 40, 30, 0.5);
+}
+
+.sheet {
+  width: 100%;
+  max-width: 26rem;
+  padding: 1.4rem;
+  background: #fff;
+  border-radius: 1.25rem;
+  box-shadow: $shadow-lift;
+}
+
+.sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+
+  h3 { margin: 0; font-size: 1.1rem; }
+  p { margin: 0; color: $secondary; font-size: 0.9rem; }
+}
+
+.sheet-facts {
+  margin: 0 0 1rem;
+  padding: 0.25rem 1rem;
+  background: #f6faf7;
+  border-radius: 1rem;
+
+  > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid $border-color;
+
+    &:last-child { border-bottom: 0; }
+  }
+
+  dt { color: $secondary; font-weight: 400; }
+  dd { margin: 0; font-weight: 600; text-align: right; overflow-wrap: anywhere; }
+}
+
+.sheet-note { margin: 0 0 1rem; color: #52665d; font-size: 0.9rem; }
+.sheet-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.1rem; }
+
+/* ================= সদস্য পেজ ================= */
+.icon-btn.sm { width: 2.1rem; height: 2.1rem; font-size: 0.95rem; }
+.icon-btn.danger:hover { background: #fde0dd; border-color: #f3c3be; color: #b8352b; }
+.icon-btn.is-locked { opacity: 0.4; cursor: not-allowed; &:hover { background: #fff; } }
+
+.avatar.lg { flex: none; width: 2.8rem; height: 2.8rem; font-size: 1.05rem; }
+.avatar.mint { background: $tile-mint; color: $brand-dark; }
+.avatar.sand { background: $tile-sand; color: #9a7410; }
+
+.member-list { padding: 0; overflow: hidden; }
+
+.member-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid $border-color;
+
+  &:last-child { border-bottom: 0; }
+}
+
+.member-meta { color: $secondary; font-size: 0.8rem; white-space: nowrap; }
+
+/* প্ল্যানের সীমার মিটার */
+.usage-bar {
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: 50rem;
+  background: #e8efea;
+
+  > span { display: block; height: 100%; border-radius: 50rem; background: $brand; }
+  &.is-full > span { background: #e0951f; }
+}
+
+/* ================= প্ল্যান, ধাপ ও বিপজ্জনক এলাকা ================= */
+.min-w-0 { min-width: 0; }
+
+.copy-btn {
+  padding: 0.1rem 0.35rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: #8a9c93;
+
+  &:hover { background: $brand-soft; color: $brand-dark; }
+}
+
+.plan-name { font-weight: 600; font-size: 1.05rem; color: $ink; }
+
+.plan-price {
+  margin: 0.2rem 0 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: $ink;
+  font-variant-numeric: tabular-nums;
+
+  small { font-size: 0.85rem; font-weight: 400; color: $secondary; }
+}
+
+.plan-feats {
+  margin: 0.9rem 0 0;
+  padding: 0;
+  list-style: none;
+
+  li { display: flex; gap: 0.55rem; padding: 0.25rem 0; font-size: 0.9rem; }
+  i { flex: none; margin-top: 0.15rem; }
+  .yes i { color: $brand; }
+  .no { color: #9aa9a2; i { color: #c3cec8; } }
+}
+
+/* বেছে নেওয়ার মতো প্ল্যান-কার্ড */
+.plan-card {
+  position: relative;
+  display: block;
+  height: 100%;
+  padding: 1.2rem 1.25rem;
+  background: #fff;
+  border: 2px solid $border-color;
+  border-radius: $border-radius-lg;
+  cursor: pointer;
+
+  &:hover { border-color: #b9d9c7; }
+  &:focus-within { outline: 2px solid #5dbb87; outline-offset: 2px; }
+  &.is-selected { border-color: $brand; background: #f6fcf8; box-shadow: 0 0 0 0.2rem rgba(31, 138, 79, 0.12); }
+
+  .plan-check { position: absolute; top: 1rem; right: 1rem; font-size: 1.3rem; color: $brand; }
+}
+
+fieldset:disabled .plan-card { cursor: default; opacity: 0.65; }
+
+/* পেমেন্টের ধাপ */
+.step {
+  display: flex;
+  gap: 0.85rem;
+  padding: 0.95rem 0;
+  border-bottom: 1px solid $border-color;
+
+  &:first-child { padding-top: 0; }
+  &:last-child { padding-bottom: 0; border-bottom: 0; }
+
+  .step-no {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 50%;
+    background: $brand-soft;
+    color: $brand-dark;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  .step-title { font-weight: 600; color: $ink; }
+}
+
+.pay-number {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.9rem;
+  background: #f6faf7;
+  border-radius: 0.8rem;
+
+  b { font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+}
+
+.panel.danger-zone { background: #fffafa; border: 1px solid #f1cdc9; box-shadow: none; }
+
+/* ================= গরু ও বাছুর ================= */
+[x-cloak] { display: none !important; }
+button.tab-chip { font: inherit; cursor: pointer; }
+
+.cow-card {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  height: 100%;
+  min-height: 9.5rem;
+  background: #fff;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-card;
+
+  &:hover { box-shadow: $shadow-lift; }
+  .icon-btn { position: relative; z-index: 2; flex: none; }
+}
+
+.cow-photo {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 38%;
+  max-width: 9.5rem;
+  background: $tile-mint;
+  color: #8bb7a0;
+  font-size: 2rem;
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+}
+
+.cow-body { flex: 1; min-width: 0; padding: 0.9rem 1rem; }
+.cow-tag { font-size: 1.15rem; font-weight: 700; color: $ink; text-decoration: none; }
+
+.fab {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 1030;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 3.4rem;
+  padding: 0 1.2rem 0 1rem;
+  border-radius: 50rem;
+  background: $brand;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 10px 24px rgba(31, 138, 79, 0.4);
+
+  i { font-size: 1.4rem; }
+  &:hover { background: $brand-dark; color: #fff; }
+
+  @include media-breakpoint-down(lg) {
+    bottom: 5.75rem;
+    justify-content: center;
+    width: 3.4rem;
+    padding: 0;
+
+    span { display: none; }
+  }
+}
+
+/* বিবরণ পেজ */
+.cow-hero {
+  display: grid;
+  gap: 1.25rem;
+  padding: 1.1rem;
+
+  @include media-breakpoint-up(md) { grid-template-columns: 15rem 1fr; }
+}
+
+.cow-hero-photo {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border-radius: 1rem;
+  background: $tile-mint;
+  color: #8bb7a0;
+  font-size: 3rem;
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+}
+
+.tile {
+  height: 100%;
+  padding: 0.8rem 1rem;
+  border-radius: 1rem;
+
+  .tile-label { font-size: 0.8rem; color: $secondary; }
+  .tile-value { font-size: 1.2rem; font-weight: 600; color: $ink; font-variant-numeric: tabular-nums; }
+
+  &.mint { background: $tile-mint; }
+  &.sky { background: $tile-sky; }
+  &.peach { background: $tile-peach; }
+  &.lilac { background: $tile-lilac; }
+  &.sand { background: $tile-sand; }
+}
+
+.tabs-x {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.1rem;
+  overflow-x: auto;
+  border-bottom: 1px solid $border-color;
+
+  button {
+    flex: none;
+    padding: 0.7rem 0;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    background: transparent;
+    color: $secondary;
+    font: inherit;
+    font-weight: 500;
+
+    &.active { color: $brand; border-bottom-color: $brand; }
+    &:disabled { opacity: 0.45; cursor: default; }
+  }
+}
+
+.dl-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0 1.5rem;
+  margin: 0;
+
+  @include media-breakpoint-up(md) { grid-template-columns: 1fr 1fr; }
+
+  > div { padding: 0.6rem 0; border-bottom: 1px solid $border-color; }
+  dt { font-size: 0.82rem; font-weight: 400; color: $secondary; }
+  dd { margin: 0; font-weight: 500; overflow-wrap: anywhere; }
+}
+
+/* ================= খরচ ও পেমেন্ট ================= */
+.ic.sm { width: 2.2rem; height: 2.2rem; font-size: 1rem; }
+
+tr.is-void td, .is-void { color: #9aa9a2; }
+.is-void .amt, tr.is-void .amt { text-decoration: line-through; }
+
+.pay-row-item { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.7rem 0; border-bottom: 1px solid $border-color; &:last-child { border-bottom: 0; } }
+
+/* ================= দুধ ও ড্যাশবোর্ড ================= */
+.milk-input { width: 5.5rem; }
+
+.bars { display: flex; align-items: stretch; gap: 0.6rem; height: 10rem; }
+
+.bar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.bar-track { flex: 1; display: flex; align-items: flex-end; justify-content: center; width: 100%; }
+
+.bar-fill {
+  width: 100%;
+  max-width: 2.4rem;
+  min-height: 0.25rem;
+  border-radius: 0.5rem 0.5rem 0.2rem 0.2rem;
+  background: #b9d6f2;
+}
+
+.bar.is-today .bar-fill { background: $brand; }
+
+.bar-val, .bar-label { font-size: 0.72rem; line-height: 1.4; color: $secondary; white-space: nowrap; }
+.bar-val { min-height: 1.1rem; }
+
+/* ================= স্বাস্থ্য ================= */
+.pick-list { max-height: 15rem; overflow-y: auto; border: 1px solid $border-color; border-radius: 0.75rem; }
+
+.pick-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid $border-color;
+  cursor: pointer;
+
+  &:last-child { border-bottom: 0; }
+  &:hover { background: #f6faf7; }
+}
