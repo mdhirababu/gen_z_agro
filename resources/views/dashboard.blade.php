@@ -252,7 +252,7 @@
                             <div class="alert alert-danger py-2 mb-2">{{ $overdueCount }}টি কাজের সময় পেরিয়ে গেছে।</div>
                         @endif
                         @foreach ($tasks as $t)
-                            @php $d = $t->daysToDue(); @endphp
+                            @php $d = $t->days(); @endphp
                             <div class="d-flex justify-content-between align-items-center py-1">
                                 <span>
                                     <a
@@ -274,6 +274,13 @@
                             চিকিৎসাধীন গরু:
                             <a
                                 href="{{ route('farms.health.index', [$farm, 'ongoing' => 1]) }}">{{ $sickCount }}টি</a>
+                        </div>
+                    @endif
+                    @if ($pregnantCount > 0)
+                        <div class="mt-2 small">
+                            গর্ভবতী গরু:
+                            <a
+                                href="{{ route('farms.cows.index', [$farm, 'category' => 'pregnant']) }}">{{ $pregnantCount }}টি</a>
                         </div>
                     @endif
                 </div>

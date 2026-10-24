@@ -2,7 +2,6 @@
 
 namespace App\Livewire;
 
-use App\Models\Cow;
 use App\Models\Farm;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Locked;
@@ -73,11 +72,21 @@ class CowList extends Component
 
         $base = $farm->cows()->when($status !== 'all', fn($q) => $q->where('status', $status));
 
+        // "গর্ভবতী" কোনো গরুর ধরন নয়, প্রজননের রেকর্ড থেকে আসে
+        $pregnantIds = $farm->breedingEvents()
+            ->where('status', 'pregnant')
+            ->pluck('cow_id')
+            ->unique()
+            ->values()
+            ->all();
+
         $counts = (clone $base)->selectRaw('category, count(*) as total')->groupBy('category')->pluck('total', 'category');
+        $pregnantCount = (clone $base)->whereIn('id', $pregnantIds)->count();
 
         $search = trim($this->search);
 
         $cows = (clone $base)
+            ->when($this->category === 'pregnant', fn($q) => $q->whereIn('id', $pregnantIds))
             ->when(array_key_exists($this->category, config('farm.categories')), fn($q) => $q->where('category', $this->category))
             ->when($search !== '', function ($q) use ($search) {
                 $like = '%' . $search . '%';
@@ -91,6 +100,8 @@ class CowList extends Component
             'cows' => $cows,
             'counts' => $counts,
             'total' => (int) $counts->sum(),
+            'pregnantIds' => $pregnantIds,
+            'pregnantCount' => $pregnantCount,
             'categories' => config('farm.categories'),
             'statuses' => config('farm.statuses'),
             'canCreate' => $role !== null || $user->is_super_admin,

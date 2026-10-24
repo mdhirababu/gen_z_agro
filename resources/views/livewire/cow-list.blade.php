@@ -10,6 +10,10 @@
                 {{ $meta['label'] }} <span class="count">{{ $counts[$key] ?? 0 }}</span>
             </button>
         @endforeach
+        <button type="button" wire:click="setCategory('pregnant')"
+            class="tab-chip {{ $category === 'pregnant' ? 'active' : '' }}">
+            গর্ভবতী <span class="count">{{ $pregnantCount }}</span>
+        </button>
     </div>
 
     {{-- ===== খোঁজা ও অবস্থা ===== --}}
@@ -89,6 +93,9 @@
                             <div class="d-flex flex-wrap gap-1 mt-2">
                                 <span class="tag {{ $meta['tag'] }}">{{ $meta['label'] }}</span>
                                 <span class="tag blue">{{ config('farm.sexes')[$cow->sex] ?? $cow->sex }}</span>
+                                @if (in_array($cow->id, $pregnantIds))
+                                    <span class="tag green">গর্ভবতী</span>
+                                @endif
                                 @if ($cow->status !== 'active')
                                     <span
                                         class="tag {{ $cow->status === 'dead' ? 'red' : 'gray' }}">{{ $statuses[$cow->status] ?? $cow->status }}</span>

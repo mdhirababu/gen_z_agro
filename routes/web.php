@@ -4,12 +4,15 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\PlanController as AdminPlanController;
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\BreedingController;
 use App\Http\Controllers\CowController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FarmController;
 use App\Http\Controllers\FarmMemberController;
+use App\Http\Controllers\FeedController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\MilkController;
 use App\Http\Controllers\PaymentController;
@@ -115,6 +118,38 @@ Route::middleware('auth')->group(function () {
                 Route::post('health/{healthEvent}/recover', [HealthController::class, 'recover'])->name('health.recover');
                 Route::post('health/{healthEvent}/done', [HealthController::class, 'done'])->name('health.done');
             });
+
+            // প্রজনন: {breedingEvent} অবশ্যই এই খামারের হতে হবে, নইলে 404
+            Route::scopeBindings()->group(function () {
+                Route::get('breeding', [BreedingController::class, 'index'])->name('breeding.index');
+                Route::get('breeding/create', [BreedingController::class, 'create'])->name('breeding.create');
+                Route::post('breeding', [BreedingController::class, 'store'])->name('breeding.store');
+                Route::get('breeding/{breedingEvent}', [BreedingController::class, 'show'])->name('breeding.show');
+                Route::get('breeding/{breedingEvent}/edit', [BreedingController::class, 'edit'])->name('breeding.edit');
+                Route::put('breeding/{breedingEvent}', [BreedingController::class, 'update'])->name('breeding.update');
+                Route::delete('breeding/{breedingEvent}', [BreedingController::class, 'destroy'])->name('breeding.destroy');
+                Route::post('breeding/{breedingEvent}/check', [BreedingController::class, 'check'])->name('breeding.check');
+                Route::post('breeding/{breedingEvent}/calve', [BreedingController::class, 'calve'])->name('breeding.calve');
+                Route::post('breeding/{breedingEvent}/abort', [BreedingController::class, 'abortPregnancy'])->name('breeding.abort');
+            });
+
+            // খাবার: {feedRecord}, {feedType} অবশ্যই এই খামারের হতে হবে, নইলে 404
+            Route::scopeBindings()->group(function () {
+                Route::get('feed', [FeedController::class, 'index'])->name('feed.index');
+                Route::post('feed', [FeedController::class, 'store'])->name('feed.store');
+                Route::delete('feed/{feedRecord}', [FeedController::class, 'destroy'])->name('feed.destroy');
+
+                Route::get('feed/types', [FeedController::class, 'types'])->name('feed.types');
+                Route::post('feed/types', [FeedController::class, 'storeType'])->name('feed.types.store');
+                Route::post('feed/types/defaults', [FeedController::class, 'defaults'])->name('feed.types.defaults');
+                Route::put('feed/types/{feedType}', [FeedController::class, 'updateType'])->name('feed.types.update');
+                Route::post('feed/types/{feedType}/toggle', [FeedController::class, 'toggleType'])->name('feed.types.toggle');
+            });
+
+            // SMS বিজ্ঞপ্তির সেটিং (শুধু মালিক)
+            Route::get('notifications', [NotificationController::class, 'edit'])->name('notifications.edit');
+            Route::put('notifications', [NotificationController::class, 'update'])->name('notifications.update');
+            Route::post('notifications/test', [NotificationController::class, 'test'])->name('notifications.test');
         });
     });
 

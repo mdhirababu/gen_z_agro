@@ -139,8 +139,10 @@ class CowController extends Controller
 
         $healthEvents = $cow->healthEvents()->orderByDesc('event_date')->orderByDesc('id')->limit(30)->get();
         $withdrawalUntil = $healthEvents->filter(fn($e) => $e->withdrawalActive())->max('milk_withdrawal_until');
+        $breedingEvents = $cow->breedingEvents()->orderByDesc('service_date')->orderByDesc('id')->limit(20)->get();
+        $activePregnancy = $breedingEvents->firstWhere('status', 'pregnant');
 
-        return view('cows.show', compact('farm', 'cow', 'calves', 'weights', 'rows', 'stats', 'finance', 'healthEvents', 'withdrawalUntil'));
+        return view('cows.show', compact('farm', 'cow', 'calves', 'weights', 'rows', 'stats', 'finance', 'healthEvents', 'withdrawalUntil', 'breedingEvents', 'activePregnancy'));
     }
 
     public function edit(Farm $farm, Cow $cow)

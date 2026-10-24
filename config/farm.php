@@ -85,4 +85,46 @@ return [
         'rabies'  => ['label' => 'জলাতঙ্ক (র‍্যাবিস)',        'interval_days' => 365],
         'other'   => ['label' => 'অন্যান্য',                 'interval_days' => null],
     ],
+
+    // সাধারণ গড় ধরে দেওয়া। জাত ও পশু চিকিৎসকের পরামর্শ অনুযায়ী বদলে নিয়ো।
+    'breeding' => [
+        'gestation_days' => 283,
+        'check_after_days' => 60,
+    ],
+
+    'breeding_methods' => [
+        'ai' => 'কৃত্রিম প্রজনন (AI)',
+        'natural' => 'প্রাকৃতিক (ষাঁড় দিয়ে)',
+    ],
+
+    'breeding_statuses' => [
+        'served'   => ['label' => 'সেবা হয়েছে, ফল বাকি', 'pill' => 'blue'],
+        'pregnant' => ['label' => 'গর্ভবতী',              'pill' => 'green'],
+        'open'     => ['label' => 'গর্ভ হয়নি',           'pill' => 'gray'],
+        'aborted'  => ['label' => 'গর্ভপাত',              'pill' => 'red'],
+        'calved'   => ['label' => 'প্রসব হয়েছে',         'pill' => 'purple'],
+    ],
+
+    'feed_units' => [
+        'kg' => 'কেজি',
+        'bundle' => 'আঁটি',
+        'bag' => 'বস্তা',
+        'liter' => 'লিটার',
+        'piece' => 'টি',
+    ],
+
+    'feed_targets' => [
+        'all' => 'পুরো পাল',
+        'category' => 'গরুর ধরন অনুযায়ী',
+        'cow' => 'নির্দিষ্ট গরু',
+    ],
+
+    // "সাধারণ ধরন যোগ করুন" বাটনে এগুলো তৈরি হয়। দাম নিজে বসাবে।
+    'feed_defaults' => [
+        ['name' => 'কাঁচা ঘাস', 'unit' => 'kg'],
+        ['name' => 'খড়', 'unit' => 'kg'],
+        ['name' => 'ভুসি', 'unit' => 'kg'],
+        ['name' => 'দানাদার খাদ্য', 'unit' => 'kg'],
+        ['name' => 'খৈল', 'unit' => 'kg'],
+    ],
 ];

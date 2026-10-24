@@ -153,6 +153,9 @@
                 <button type="button" :class="{ active: tab === 'finance' }" @click="tab = 'finance'">হিসাব</button>
             @endif
             <button type="button" :class="{ active: tab === 'health' }" @click="tab = 'health'">স্বাস্থ্য</button>
+            @if ($cow->sex === 'female')
+                <button type="button" :class="{ active: tab === 'breeding' }" @click="tab = 'breeding'">প্রজনন</button>
+            @endif
             <button type="button" disabled title="শীঘ্রই আসছে">দুধ</button>
         </div>
 
@@ -496,7 +499,8 @@
                                 @endif
                                 @if ($he->follow_up_status === 'open' && $he->next_due_date)
                                     <div class="small mt-1">পরের তারিখ:
-                                        <strong>{{ $he->next_due_date->format('d/m/Y') }}</strong></div>
+                                        <strong>{{ $he->next_due_date->format('d/m/Y') }}</strong>
+                                    </div>
                                 @endif
                             </div>
                         </div>
@@ -628,4 +632,61 @@
                 </div>
             </div>
         </div>
+
+        {{-- ===== প্রজনন ===== --}}
+        @if ($cow->sex === 'female')
+            <div x-show="tab === 'breeding'" x-cloak>
+                @if ($activePregnancy)
+                    @php
+                        $toCalf = $activePregnancy->expected_calving_date
+                            ? (int) now()
+                                ->startOfDay()
+                                ->diffInDays($activePregnancy->expected_calving_date->copy()->startOfDay(), false)
+                            : null;
+                    @endphp
+                    <div class="alert alert-success">
+                        <i class="bi bi-hearts me-1"></i>
+                        গাভিটি <strong>গর্ভবতী</strong>
+                        @if ($activePregnancy->expected_calving_date), প্রসবের সম্ভাব্য তারিখ
+                            {{ $activePregnancy->expected_calving_date->format('d/m/Y') }}
+                            @if ($toCalf !== null)
+                                ({{ $toCalf < 0 ? abs($toCalf) . ' দিন দেরি' : ($toCalf === 0 ? 'আজ' : $toCalf . ' দিন পরে') }})
+                            @endif
+                        @endif।
+                        <a href="{{ route('farms.breeding.show', [$farm, $activePregnancy]) }}">বিস্তারিত</a>
+                    </div>
+                @endif
+
+                <div class="panel h-auto">
+                    <div class="panel-head d-flex justify-content-between align-items-center">
+                        <span>প্রজননের ইতিহাস</span>
+                        @if ($cow->status === 'active' && $cow->category !== 'calf' && !$activePregnancy)
+                            <a href="{{ route('farms.breeding.create', [$farm, 'cow' => $cow->id]) }}"
+                                class="btn btn-sm btn-primary">
+                                <i class="bi bi-plus-lg me-1"></i>সেবা যোগ
+                            </a>
+                        @endif
+                    </div>
+                    <div class="panel-body">
+                        @forelse ($breedingEvents as $be)
+                            @php $bm = $be->statusMeta(); @endphp
+                            <div
+                                class="d-flex justify-content-between align-items-center py-2 {{ !$loop->last ? 'border-bottom' : '' }}">
+                                <div>
+                                    <a class="fw-semibold"
+                                        href="{{ route('farms.breeding.show', [$farm, $be]) }}">{{ $be->service_date->format('d/m/Y') }}</a>
+                                    <div class="small text-muted">{{ $be->methodLabel() }}@if ($be->sire_name)
+                                            , {{ $be->sire_name }}
+                                        @endif
+                                    </div>
+                                </div>
+                                <span class="pill {{ $bm['pill'] }}">{{ $bm['label'] }}</span>
+                            </div>
+                        @empty
+                            <div class="text-muted">এই গাভির কোনো প্রজননের রেকর্ড নেই।</div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        @endif
     @endsection
