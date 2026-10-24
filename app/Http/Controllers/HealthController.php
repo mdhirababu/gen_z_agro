@@ -6,12 +6,13 @@ use App\Http\Requests\SaveHealthRequest;
 use App\Models\Farm;
 use App\Models\HealthEvent;
 use App\Services\HealthService;
+use App\Services\TaskService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class HealthController extends Controller
 {
-    public function index(Request $request, Farm $farm, HealthService $health)
+    public function index(Request $request, Farm $farm, HealthService $health, TaskService $tasks)
     {
         Gate::authorize('view', $farm);
 
@@ -43,6 +44,7 @@ class HealthController extends Controller
             'taskCount' => $health->upcoming($farm, 30)->count(),
             'canFinance' => $request->user()->can('manageFinance', $farm),
             'canManage' => $request->user()->can('manageHealth', $farm),
+            'taskCount' => $tasks->upcoming($farm, 30)->count(),
         ]);
     }
 
@@ -155,17 +157,14 @@ class HealthController extends Controller
         return back()->with('success', 'কাজটি সম্পন্ন হিসেবে চিহ্নিত করা হয়েছে।');
     }
 
-    public function tasks(Farm $farm, HealthService $health)
+    public function tasks(Farm $farm, TaskService $tasks)
     {
         Gate::authorize('view', $farm);
 
         return view('health.tasks', [
             'farm' => $farm,
-            'tasks' => $health->upcoming($farm, 30),
-            'later' => $farm->healthEvents()
-                ->where('follow_up_status', 'open')
-                ->whereDate('next_due_date', '>', now()->addDays(30)->toDateString())
-                ->count(),
+            'tasks' => $tasks->upcoming($farm, 30),
+            'later' => $tasks->laterCount($farm, 30),
         ]);
     }
 }

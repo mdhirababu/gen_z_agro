@@ -117,4 +117,40 @@ class Farm extends Model
     {
         return $this->hasMany(HealthEvent::class);
     }
+
+    public function breedingEvents(): HasMany
+    {
+        return $this->hasMany(BreedingEvent::class);
+    }
+
+    /** প্ল্যানে আর কয়টি সক্রিয় গরুর জায়গা আছে। null মানে সীমাহীন। */
+    public function cowSlotsLeft(): ?int
+    {
+        $plan = $this->subscription?->plan;
+
+        if (! $plan) {
+            return 0;
+        }
+
+        if ($plan->max_cows === null) {
+            return null;
+        }
+
+        return max(0, $plan->max_cows - $this->cows()->where('status', Cow::STATUS_ACTIVE)->count());
+    }
+
+    protected function casts(): array
+    {
+        return ['sms_enabled' => 'boolean'];
+    }
+
+    public function feedTypes(): HasMany
+    {
+        return $this->hasMany(FeedType::class);
+    }
+
+    public function feedRecords(): HasMany
+    {
+        return $this->hasMany(FeedRecord::class);
+    }
 }

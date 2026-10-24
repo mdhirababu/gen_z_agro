@@ -52,4 +52,16 @@ class FarmPolicy
     {
         return in_array($farm->roleOf($user), [Farm::ROLE_OWNER, Farm::ROLE_MANAGER], true);
     }
+
+    /** খাবারের ধরন বদলানো ও রেকর্ড মোছা: মালিক ও ম্যানেজার */
+    public function manageFeed(User $user, Farm $farm): bool
+    {
+        return in_array($farm->roleOf($user), [Farm::ROLE_OWNER, Farm::ROLE_MANAGER], true);
+    }
+
+    /** SMS বিজ্ঞপ্তির সেটিং: শুধু মালিক (খরচ হয় বলে) */
+    public function manageNotifications(User $user, Farm $farm): bool
+    {
+        return $farm->roleOf($user) === Farm::ROLE_OWNER;
+    }
 }

@@ -124,4 +124,9 @@ class Cow extends Model
     {
         return $this->hasMany(HealthEvent::class);
     }
+
+    public function breedingEvents(): HasMany
+    {
+        return $this->hasMany(BreedingEvent::class);
+    }
 }

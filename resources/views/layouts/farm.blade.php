@@ -77,6 +77,14 @@
                         href="{{ route('farms.health.index', $currentFarm) }}">
                         <i class="bi bi-heart-pulse"></i><span class="sb-label">চিকিৎসা ও টিকা</span>
                     </a>
+                    <a class="sb-link {{ request()->routeIs('farms.breeding.*') ? 'active' : '' }}" title="প্রজনন"
+                        href="{{ route('farms.breeding.index', $currentFarm) }}">
+                        <i class="bi bi-hearts"></i><span class="sb-label">প্রজনন</span>
+                    </a>
+                    <a class="sb-link {{ request()->routeIs('farms.feed.*') ? 'active' : '' }}" title="খাবার"
+                        href="{{ route('farms.feed.index', $currentFarm) }}">
+                        <i class="bi bi-basket"></i><span class="sb-label">খাবার</span>
+                    </a>
 
                     <div class="sb-title">হিসাব</div>
                     @can('manageFinance', $currentFarm)
@@ -108,6 +116,11 @@
                         <a class="sb-link {{ request()->routeIs('farms.billing.*') ? 'active' : '' }}" title="সাবস্ক্রিপশন"
                             href="{{ route('farms.billing.index', $currentFarm) }}"><i class="bi bi-credit-card"></i><span
                                 class="sb-label">সাবস্ক্রিপশন</span></a>
+                    @endcan
+                    @can('manageNotifications', $currentFarm)
+                        <a class="sb-link {{ request()->routeIs('farms.notifications.*') ? 'active' : '' }}"
+                            title="SMS বিজ্ঞপ্তি" href="{{ route('farms.notifications.edit', $currentFarm) }}"><i
+                                class="bi bi-chat-dots"></i><span class="sb-label">SMS বিজ্ঞপ্তি</span></a>
                     @endcan
                     @can('update', $currentFarm)
                         <a class="sb-link {{ request()->routeIs('farms.edit') ? 'active' : '' }}" title="খামারের সেটিংস"

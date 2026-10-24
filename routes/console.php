@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('subscriptions:sync')->daily();
+Schedule::command('sms:send-reminders')->dailyAt('08:00')->timezone('Asia/Dhaka');

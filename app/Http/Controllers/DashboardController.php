@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Cow;
 use App\Services\HealthService;
+use App\Services\TaskService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request, HealthService $health)
+    public function index(Request $request, HealthService $health, TaskService $taskService)
     {
         $farm = $request->attributes->get('currentFarm');
         $user = $request->user();
@@ -58,16 +59,20 @@ class DashboardController extends Controller
             'topDues' => collect(),
         ];
 
-        // ---- আসন্ন কাজ ----
-        $upcoming = $health->upcoming($farm, 30);
+        // ---- আসন্ন কাজ (টিকা, গর্ভ পরীক্ষা, প্রসব) ----
+        $upcoming = $taskService->upcoming($farm, 30);
         $data['tasks'] = $upcoming->take(5);
         $data['taskCount'] = $upcoming->count();
-        $data['overdueCount'] = $upcoming->filter(fn($e) => $e->isOverdue())->count();
+        $data['overdueCount'] = $upcoming->filter(fn($t) => $t->isOverdue())->count();
         $data['sickCount'] = (int) $farm->healthEvents()
             ->where('kind', 'treatment')
             ->where('outcome', 'ongoing')
             ->distinct()
             ->count('cow_id');
+        $data['pregnantCount'] = (int) $farm->breedingEvents()
+            ->where('status', 'pregnant')
+            ->whereHas('cow', fn($q) => $q->where('status', 'active')->whereNull('deleted_at'))
+            ->count();
 
         // ---- টাকা: শুধু মালিক ও ম্যানেজার ----
         if ($canFinance) {
