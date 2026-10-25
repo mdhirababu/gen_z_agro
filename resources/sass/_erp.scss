@@ -1075,3 +1075,18 @@ tr.is-void td, .is-void { color: #9aa9a2; }
   &:last-child { border-bottom: 0; }
   &:hover { background: #f6faf7; }
 }
+
+/* ================= প্রিন্ট ================= */
+@media print {
+  .app-sidebar, .app-header, .bottom-nav, .app-overlay, .fab, .no-print { display: none !important; }
+
+  .app-shell { display: block; padding: 0; }
+  .app-main { margin: 0; }
+  body { background: #fff; }
+
+  .panel, .kpi, .table-card, .tile {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+    break-inside: avoid;
+  }
+}

@@ -16,6 +16,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\MilkController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\WeightRecordController;
 use Illuminate\Support\Facades\Auth;
@@ -150,6 +151,11 @@ Route::middleware('auth')->group(function () {
             Route::get('notifications', [NotificationController::class, 'edit'])->name('notifications.edit');
             Route::put('notifications', [NotificationController::class, 'update'])->name('notifications.update');
             Route::post('notifications/test', [NotificationController::class, 'test'])->name('notifications.test');
+
+            // রিপোর্ট: শুধু মালিক ও ম্যানেজার (controller-এ যাচাই হয়)
+            Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+            Route::get('reports/cash-flow', [ReportController::class, 'cashFlow'])->name('reports.cash-flow');
+            Route::get('reports/profit-loss', [ReportController::class, 'profitLoss'])->name('reports.profit-loss');
         });
     });
 

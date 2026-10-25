@@ -103,8 +103,12 @@
                             <i class="bi bi-person-lines-fill"></i><span class="sb-label">ক্রেতা ও বকেয়া</span>
                         </a>
                     @endcan
-                    <span class="sb-link is-disabled" title="রিপোর্ট"><i class="bi bi-graph-up-arrow"></i><span
-                            class="sb-label">রিপোর্ট</span><em class="soon">শীঘ্রই</em></span>
+                    @can('manageFinance', $currentFarm)
+                        <a class="sb-link {{ request()->routeIs('farms.reports.*') ? 'active' : '' }}" title="রিপোর্ট"
+                            href="{{ route('farms.reports.index', $currentFarm) }}">
+                            <i class="bi bi-graph-up-arrow"></i><span class="sb-label">রিপোর্ট</span>
+                        </a>
+                    @endcan
 
                     <div class="sb-title">ব্যবস্থাপনা</div>
                     @can('manageMembers', $currentFarm)
