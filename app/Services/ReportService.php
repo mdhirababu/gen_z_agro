@@ -269,6 +269,367 @@ class ReportService
         ];
     }
 
+    /**
+     * গরুভিত্তিক লাভ-ক্ষতি (সময়কালের)।
+     * আয়: দুধের আয় (উৎপাদনের অনুপাতে ভাগ) + গরু বিক্রির টাকা
+     * ব্যয়: সরাসরি খরচ + যৌথ খরচের ভাগ + (বিক্রি বা বাদ পড়লে) গরুর ভিত্তিমূল্য
+     * ভাগ না হওয়া আয়-ব্যয় আলাদা রেখে যোগফল লাভ-ক্ষতি রিপোর্টের নিট ফলের সঙ্গে মেলে।
+     */
+    public function cowProfitability(Farm $farm, ReportPeriod $p): array
+    {
+        $from = $p->from->copy()->startOfDay();
+        $to = $p->to->copy()->startOfDay();
+        $fromS = $p->fromDate();
+        $toS = $p->toDate();
+        $categories = config('farm.expense_categories');
+
+        // ---- গরু ও সময়কালে খামারে থাকার দিন ----
+        $info = [];
+
+        foreach ($farm->cows()->get() as $cow) {
+            $start = $cow->onFarmFrom();
+            $end = $cow->exit_date ? $cow->exit_date->copy()->startOfDay() : null;
+
+            $a = $start->gt($from) ? $start->copy() : $from->copy();
+            $b = ($end && $end->lt($to)) ? $end->copy() : $to->copy();
+
+            $info[$cow->id] = [
+                'cow' => $cow,
+                'start' => $start,
+                'end' => $end,
+                'days' => $a->lte($b) ? (int) $a->diffInDays($b) + 1 : 0,
+            ];
+        }
+
+        $blank = [
+            'liters' => 0.0,
+            'income_milk' => 0.0,
+            'income_sale' => 0.0,
+            'cost_direct' => 0.0,
+            'joint_feed' => 0.0,
+            'joint_other' => 0.0,
+            'cost_base' => 0.0,
+        ];
+        $rows = array_map(fn() => $blank, $info);
+
+        $unIncomeLines = [];
+        $unExpenseLines = [];
+
+        // ---- ভাগের ওজন ----
+        $weightsDays = array_map(fn($i) => (float) $i['days'], $info);
+        $weightsEqual = array_map(fn($i) => $i['days'] > 0 ? 1.0 : 0.0, $info);
+        $weightsFeed = $this->feedWeights($farm, $info, $fromS, $toS);
+
+        $feedFallback = false;
+        $weightsFor = function (string $category) use ($weightsDays, $weightsEqual, $weightsFeed, &$feedFallback): array {
+            $rule = $category === 'feed' ? config('farm.allocation.feed') : config('farm.allocation.other');
+
+            if ($rule === 'equal') {
+                return $weightsEqual;
+            }
+
+            if ($category === 'feed' && $rule === 'feed_records') {
+                if (array_sum($weightsFeed) > 0) {
+                    return $weightsFeed;
+                }
+
+                $feedFallback = true; // খাবারের রেকর্ড (বা দাম) নেই, গরু-দিনে ফিরে যাওয়া হলো
+            }
+
+            return $weightsDays;
+        };
+
+        // ---- যৌথ খরচ (কোনো গরুর নামে নেই) ----
+        $joint = $farm->expenses()
+            ->where('status', 'active')
+            ->whereNull('cow_id')
+            ->whereDate('expense_date', '>=', $fromS)
+            ->whereDate('expense_date', '<=', $toS)
+            ->selectRaw('category, sum(total_amount) as total')
+            ->groupBy('category')
+            ->get();
+
+        foreach ($joint as $row) {
+            $total = (float) $row->total;
+            $parts = $this->split($total, $weightsFor((string) $row->category));
+
+            if ($parts === null) {
+                $unExpenseLines[] = [
+                    'label' => ($categories[$row->category]['label'] ?? $row->category) . ' (এই সময়ে কোনো গরু ছিল না)',
+                    'amount' => $total,
+                ];
+                continue;
+            }
+
+            $key = $row->category === 'feed' ? 'joint_feed' : 'joint_other';
+
+            foreach ($parts as $id => $amount) {
+                $rows[$id][$key] += $amount;
+            }
+        }
+
+        // ---- সরাসরি খরচ (গরুর নামে) ----
+        $orphanDirect = 0.0;
+
+        $directRows = $farm->expenses()
+            ->where('status', 'active')
+            ->whereNotNull('cow_id')
+            ->whereDate('expense_date', '>=', $fromS)
+            ->whereDate('expense_date', '<=', $toS)
+            ->selectRaw('cow_id, sum(total_amount) as total')
+            ->groupBy('cow_id')
+            ->get();
+
+        foreach ($directRows as $row) {
+            if (isset($rows[$row->cow_id])) {
+                $rows[$row->cow_id]['cost_direct'] += (float) $row->total;
+            } else {
+                $orphanDirect += (float) $row->total;
+            }
+        }
+
+        if ($orphanDirect > 0) {
+            $unExpenseLines[] = ['label' => 'মুছে ফেলা গরুর সরাসরি খরচ', 'amount' => $orphanDirect];
+        }
+
+        // ---- দুধের আয়: উৎপাদনের অনুপাতে ----
+        $milkRevenue = (float) $farm->sales()
+            ->where('sale_type', 'milk')
+            ->where('status', 'active')
+            ->whereDate('sold_at', '>=', $fromS)
+            ->whereDate('sold_at', '<=', $toS)
+            ->sum('total_amount');
+
+        $production = $farm->milkRecords()
+            ->whereDate('milk_date', '>=', $fromS)
+            ->whereDate('milk_date', '<=', $toS)
+            ->selectRaw('cow_id, sum(total_liters) as liters')
+            ->groupBy('cow_id')
+            ->get();
+
+        $totalLiters = (float) $production->sum('liters');
+
+        foreach ($production as $row) {
+            if (isset($rows[$row->cow_id])) {
+                $rows[$row->cow_id]['liters'] = (float) $row->liters;
+            }
+        }
+
+        if ($milkRevenue > 0) {
+            if ($totalLiters > 0) {
+                $orphanMilk = 0.0;
+
+                foreach ($production as $row) {
+                    $share = $milkRevenue * (float) $row->liters / $totalLiters;
+
+                    if (isset($rows[$row->cow_id])) {
+                        $rows[$row->cow_id]['income_milk'] += $share;
+                    } else {
+                        $orphanMilk += $share;
+                    }
+                }
+
+                if ($orphanMilk > 0) {
+                    $unIncomeLines[] = ['label' => 'মুছে ফেলা গরুর দুধের আয়', 'amount' => $orphanMilk];
+                }
+            } else {
+                $unIncomeLines[] = ['label' => 'দুধ বিক্রির আয় (উৎপাদনের রেকর্ড নেই বলে ভাগ করা যায়নি)', 'amount' => $milkRevenue];
+            }
+        }
+
+        // ---- গোবর ও অন্যান্য আয়: কোনো গরুর নয় ----
+        $otherIncome = (float) $farm->sales()
+            ->whereIn('sale_type', ['manure', 'other_income'])
+            ->where('status', 'active')
+            ->whereDate('sold_at', '>=', $fromS)
+            ->whereDate('sold_at', '<=', $toS)
+            ->sum('total_amount');
+
+        if ($otherIncome > 0) {
+            $unIncomeLines[] = ['label' => 'গোবর ও অন্যান্য আয় (কোনো নির্দিষ্ট গরুর নয়)', 'amount' => $otherIncome];
+        }
+
+        // ---- গরু বিক্রি: টাকা আয়, ভিত্তিমূল্য খরচ ----
+        $saleRows = $farm->sales()
+            ->where('sales.sale_type', 'cow')
+            ->where('sales.status', 'active')
+            ->whereDate('sales.sold_at', '>=', $fromS)
+            ->whereDate('sales.sold_at', '<=', $toS)
+            ->join('cows', 'cows.id', '=', 'sales.cow_id')
+            ->get(['sales.cow_id', 'sales.total_amount', 'cows.acquisition_type', 'cows.purchase_price', 'cows.opening_value']);
+
+        $orphanSalePrice = 0.0;
+        $orphanSaleBase = 0.0;
+
+        foreach ($saleRows as $row) {
+            $base = match ($row->acquisition_type) {
+                'purchased' => (float) $row->purchase_price,
+                'existing' => (float) $row->opening_value,
+                default => 0.0,
+            };
+
+            if (isset($rows[$row->cow_id])) {
+                $rows[$row->cow_id]['income_sale'] += (float) $row->total_amount;
+                $rows[$row->cow_id]['cost_base'] += $base;
+            } else {
+                $orphanSalePrice += (float) $row->total_amount;
+                $orphanSaleBase += $base;
+            }
+        }
+
+        if ($orphanSalePrice > 0) {
+            $unIncomeLines[] = ['label' => 'মুছে ফেলা গরুর বিক্রির টাকা', 'amount' => $orphanSalePrice];
+        }
+        if ($orphanSaleBase > 0) {
+            $unExpenseLines[] = ['label' => 'মুছে ফেলা গরুর ভিত্তিমূল্য', 'amount' => $orphanSaleBase];
+        }
+
+        // ---- মারা গেলে বা সরালে ভিত্তিমূল্য ক্ষতি ----
+        foreach ($info as $id => $i) {
+            $cow = $i['cow'];
+
+            if (in_array($cow->status, ['dead', 'transferred'], true) && $cow->exit_date) {
+                $exit = $cow->exit_date->toDateString();
+
+                if ($exit >= $fromS && $exit <= $toS) {
+                    $rows[$id]['cost_base'] += $cow->baseValue();
+                }
+            }
+        }
+
+        // ---- ফলাফল ----
+        $out = [];
+        $rawResult = 0.0;
+
+        foreach ($info as $id => $i) {
+            $r = $rows[$id];
+            $income = $r['income_milk'] + $r['income_sale'];
+            $jointSum = $r['joint_feed'] + $r['joint_other'];
+            $cost = $r['cost_direct'] + $jointSum + $r['cost_base'];
+
+            if ($i['days'] === 0 && $income == 0.0 && $cost == 0.0 && $r['liters'] == 0.0) {
+                continue;
+            }
+
+            $rawResult += $income - $cost;
+
+            $out[] = [
+                'cow' => $i['cow'],
+                'days' => $i['days'],
+                'liters' => round($r['liters'], 2),
+                'income_milk' => round($r['income_milk'], 2),
+                'income_sale' => round($r['income_sale'], 2),
+                'income' => round($income, 2),
+                'cost_direct' => round($r['cost_direct'], 2),
+                'joint_feed' => round($r['joint_feed'], 2),
+                'joint_other' => round($r['joint_other'], 2),
+                'joint' => round($jointSum, 2),
+                'cost_base' => round($r['cost_base'], 2),
+                'cost' => round($cost, 2),
+                'result' => round($income - $cost, 2),
+            ];
+        }
+
+        $totals = [];
+        foreach (['income', 'cost_direct', 'joint', 'cost_base', 'cost', 'result'] as $key) {
+            $totals[$key] = round((float) array_sum(array_column($out, $key)), 2);
+        }
+
+        $unIncome = (float) array_sum(array_column($unIncomeLines, 'amount'));
+        $unExpense = (float) array_sum(array_column($unExpenseLines, 'amount'));
+
+        return [
+            'rows' => $out,
+            'totals' => $totals,
+            'unallocated' => [
+                'income' => round($unIncome, 2),
+                'expense' => round($unExpense, 2),
+                'income_lines' => $unIncomeLines,
+                'expense_lines' => $unExpenseLines,
+            ],
+            // গরুর ফলের যোগফল + ভাগ না হওয়া আয় − ভাগ না হওয়া খরচ = লাভ-ক্ষতির নিট ফল
+            'check_net' => round($rawResult + $unIncome - $unExpense, 2),
+            'rules' => [
+                'feed' => (string) config('farm.allocation.feed'),
+                'other' => (string) config('farm.allocation.other'),
+            ],
+            'feed_fallback' => $feedFallback,
+        ];
+    }
+
+    /** যৌথ খাবারের খরচ ভাগের ওজন: খাবারের রেকর্ডের (পরিমাণ × দাম) মান, গরু ধরে ধরে */
+    private function feedWeights(Farm $farm, array $info, string $from, string $to): array
+    {
+        $weights = array_fill_keys(array_keys($info), 0.0);
+
+        $records = $farm->feedRecords()
+            ->join('feed_types', 'feed_types.id', '=', 'feed_records.feed_type_id')
+            ->whereDate('feed_records.fed_on', '>=', $from)
+            ->whereDate('feed_records.fed_on', '<=', $to)
+            ->get([
+                'feed_records.fed_on',
+                'feed_records.quantity',
+                'feed_records.target',
+                'feed_records.category',
+                'feed_records.cow_id',
+                'feed_types.price_per_unit',
+            ]);
+
+        foreach ($records as $record) {
+            $value = (float) $record->quantity * (float) $record->price_per_unit;
+
+            if ($value <= 0) {
+                continue; // দাম দেওয়া নেই, ভাগের হিসাবে ধরা যায় না
+            }
+
+            if ($record->target === 'cow') {
+                if (isset($weights[$record->cow_id])) {
+                    $weights[$record->cow_id] += $value;
+                }
+                continue;
+            }
+
+            $date = $record->fed_on->copy()->startOfDay();
+
+            // সেদিন খামারে ছিল এমন গরুদের মধ্যে সমান ভাগ (ধরন বেছে দিলে শুধু সেই ধরনের গরু)
+            $eligible = array_filter($info, fn($i) => $i['start']->lte($date)
+                && (! $i['end'] || $i['end']->gte($date))
+                && ($record->target !== 'category' || $i['cow']->category === $record->category));
+
+            if (! $eligible) {
+                continue;
+            }
+
+            $share = $value / count($eligible);
+
+            foreach ($eligible as $id => $_) {
+                $weights[$id] += $share;
+            }
+        }
+
+        return $weights;
+    }
+
+    /** $total-কে $weights অনুপাতে ভাগ করে। ওজনের যোগফল ০ হলে null */
+    private function split(float $total, array $weights): ?array
+    {
+        $sum = array_sum($weights);
+
+        if ($sum <= 0) {
+            return null;
+        }
+
+        $parts = [];
+
+        foreach ($weights as $id => $weight) {
+            if ($weight > 0) {
+                $parts[$id] = $total * $weight / $sum;
+            }
+        }
+
+        return $parts;
+    }
+
     /** ৩১ দিন বা কম হলে দিনভিত্তিক, বেশি হলে মাসভিত্তিক */
     private function buckets(ReportPeriod $p): array
     {
