@@ -129,4 +129,16 @@ class Cow extends Model
     {
         return $this->hasMany(BreedingEvent::class);
     }
+
+    /** গরুটি কোন তারিখ থেকে খামারে আছে বলে ধরা হবে (যৌথ খরচ ভাগের জন্য) */
+    public function onFarmFrom(): \Illuminate\Support\Carbon
+    {
+        $date = match ($this->acquisition_type) {
+            'born' => $this->birth_date,
+            'purchased' => $this->purchase_date,
+            default => null,
+        };
+
+        return ($date ?: $this->created_at)->copy()->startOfDay();
+    }
 }

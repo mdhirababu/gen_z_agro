@@ -127,4 +127,9 @@ return [
         ['name' => 'দানাদার খাদ্য', 'unit' => 'kg'],
         ['name' => 'খৈল', 'unit' => 'kg'],
     ],
+
+    'allocation' => [
+        'feed' => 'feed_records',   // feed_records (খাবারের রেকর্ড), cow_days (গরু-দিন), equal (সমান ভাগ)
+        'other' => 'cow_days',      // cow_days (গরু-দিন), equal (সমান ভাগ)
+    ],
 ];

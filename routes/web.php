@@ -156,6 +156,7 @@ Route::middleware('auth')->group(function () {
             Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
             Route::get('reports/cash-flow', [ReportController::class, 'cashFlow'])->name('reports.cash-flow');
             Route::get('reports/profit-loss', [ReportController::class, 'profitLoss'])->name('reports.profit-loss');
+            Route::get('reports/cows', [ReportController::class, 'cows'])->name('reports.cows');
         });
     });
 

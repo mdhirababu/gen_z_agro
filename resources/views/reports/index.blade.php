@@ -65,15 +65,24 @@
         </div>
 
         <div class="col-lg-6">
-            <div class="panel h-100" style="opacity: 0.6">
+            <div class="panel h-100">
                 <div class="panel-body">
-                    <div class="d-flex align-items-center gap-3">
+                    <div class="d-flex align-items-center gap-3 mb-3">
                         <span class="ic lilac"><i class="bi bi-collection"></i></span>
                         <div>
-                            <h5 class="mb-0">গরুভিত্তিক লাভ-ক্ষতি <span class="pill gray">শীঘ্রই</span></h5>
-                            <div class="small text-muted">প্রতিটি গরুর বিনিয়োগ, খরচ (যৌথ খরচ ভাগসহ) ও ফলাফল</div>
+                            <h5 class="mb-0">গরুভিত্তিক লাভ-ক্ষতি</h5>
+                            <div class="small text-muted">প্রতিটি গরুর আয়, খরচ (যৌথ খরচের ভাগসহ) ও ফল</div>
                         </div>
                     </div>
+                    @if ($cowReportAllowed)
+                        <a href="{{ route('farms.reports.cows', $farm) }}" class="btn btn-primary">গরুভিত্তিক রিপোর্ট দেখুন</a>
+                    @else
+                        <div class="small text-muted mb-2">এই রিপোর্ট আপনার বর্তমান প্ল্যানে নেই।</div>
+                        @can('manageBilling', $farm)
+                            <a href="{{ route('farms.billing.index', $farm) }}" class="btn btn-outline-primary">প্ল্যান
+                                দেখুন</a>
+                        @endcan
+                    @endif
                 </div>
             </div>
         </div>
