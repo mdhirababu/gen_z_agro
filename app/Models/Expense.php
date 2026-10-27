@@ -6,11 +6,14 @@ use App\Models\Concerns\BelongsToFarm;
 use App\Models\Concerns\Payable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\Auditable;
 
 class Expense extends Model
 {
-    use BelongsToFarm, Payable;
+    use BelongsToFarm, Payable, Auditable;
 
+    protected array $auditIgnore = ['paid_amount', 'payment_status'];
+    protected bool $auditVoidsOnStatus = true;
     // টাকার অঙ্ক, অবস্থা, farm_id, created_by এখানে নেই: শুধু service বসাবে
     protected $fillable = [
         'cow_id',

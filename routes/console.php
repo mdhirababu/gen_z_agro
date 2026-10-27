@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 
 Schedule::command('subscriptions:sync')->daily();
 Schedule::command('sms:send-reminders')->dailyAt('08:00')->timezone('Asia/Dhaka');
+Schedule::command('audit:prune')->monthlyOn(1, '03:00')->timezone('Asia/Dhaka');

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\PlanController as AdminPlanController;
+use App\Http\Controllers\AuditController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\BreedingController;
 use App\Http\Controllers\CowController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\HealthController;
 use App\Http\Controllers\MilkController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReportExportController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\WeightRecordController;
 use Illuminate\Support\Facades\Auth;
@@ -157,6 +159,13 @@ Route::middleware('auth')->group(function () {
             Route::get('reports/cash-flow', [ReportController::class, 'cashFlow'])->name('reports.cash-flow');
             Route::get('reports/profit-loss', [ReportController::class, 'profitLoss'])->name('reports.profit-loss');
             Route::get('reports/cows', [ReportController::class, 'cows'])->name('reports.cows');
+            Route::get('reports/{report}/export/{format}', ReportExportController::class)
+                ->name('reports.export')
+                ->whereIn('report', ['cash-flow', 'profit-loss', 'cows'])
+                ->whereIn('format', ['xlsx', 'pdf'])
+                ->middleware('throttle:20,1');
+            // অডিট লগ: শুধু মালিক (controller-এ যাচাই হয়)
+            Route::get('audit', [AuditController::class, 'index'])->name('audit.index');
         });
     });
 

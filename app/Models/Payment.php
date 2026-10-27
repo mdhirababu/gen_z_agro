@@ -6,11 +6,13 @@ use App\Models\Concerns\BelongsToFarm;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use App\Models\Concerns\Auditable;
 
 class Payment extends Model
 {
-    use BelongsToFarm;
+    use BelongsToFarm, Auditable;
 
+    protected bool $auditVoidsOnStatus = true;
     protected $fillable = ['amount', 'paid_at', 'method', 'note'];
 
     protected function casts(): array

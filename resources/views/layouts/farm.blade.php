@@ -126,6 +126,11 @@
                             title="SMS বিজ্ঞপ্তি" href="{{ route('farms.notifications.edit', $currentFarm) }}"><i
                                 class="bi bi-chat-dots"></i><span class="sb-label">SMS বিজ্ঞপ্তি</span></a>
                     @endcan
+                    @can('viewAudit', $currentFarm)
+                        <a class="sb-link {{ request()->routeIs('farms.audit.*') ? 'active' : '' }}" title="অডিট লগ"
+                            href="{{ route('farms.audit.index', $currentFarm) }}"><i class="bi bi-journal-text"></i><span
+                                class="sb-label">অডিট লগ</span></a>
+                    @endcan
                     @can('update', $currentFarm)
                         <a class="sb-link {{ request()->routeIs('farms.edit') ? 'active' : '' }}" title="খামারের সেটিংস"
                             href="{{ route('farms.edit', $currentFarm) }}"><i class="bi bi-gear"></i><span

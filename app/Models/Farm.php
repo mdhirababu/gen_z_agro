@@ -9,14 +9,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Concerns\Auditable;
 
 class Farm extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, Auditable;
 
     public const ROLE_OWNER = 'owner';
     public const ROLE_MANAGER = 'manager';
     public const ROLE_STAFF = 'staff';
+
+    protected array $auditOnly = ['name', 'owner_user_id', 'sms_enabled'];
 
     protected $fillable = [
         'owner_user_id',
@@ -33,9 +36,10 @@ class Farm extends Model
         return $this->belongsTo(User::class, 'owner_user_id');
     }
 
-    public function users(): BelongsToMany
+    public function users()
     {
         return $this->belongsToMany(User::class)
+            ->using(\App\Models\FarmMember::class)
             ->withPivot('role')
             ->withTimestamps();
     }

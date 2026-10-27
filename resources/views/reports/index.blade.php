@@ -88,13 +88,14 @@
         </div>
 
         <div class="col-lg-6">
-            <div class="panel h-100" style="opacity: 0.6">
+            <div class="panel h-100">
                 <div class="panel-body">
                     <div class="d-flex align-items-center gap-3">
                         <span class="ic sky"><i class="bi bi-file-earmark-arrow-down"></i></span>
                         <div>
-                            <h5 class="mb-0">Excel ও PDF <span class="pill gray">শীঘ্রই</span></h5>
-                            <div class="small text-muted">রিপোর্ট ডাউনলোড (এখন প্রতিটি রিপোর্টে "প্রিন্ট" বাটন আছে)</div>
+                            <h5 class="mb-0">Excel ও PDF ডাউনলোড</h5>
+                            <div class="small text-muted">যেকোনো রিপোর্ট খুলে ওপরের "Excel" বা "PDF" বাটন চাপুন। যে সময়কাল
+                                ও ফিল্টার বেছেছেন, সেটাই নামবে।</div>
                         </div>
                     </div>
                 </div>

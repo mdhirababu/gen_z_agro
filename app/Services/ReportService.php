@@ -652,4 +652,35 @@ class ReportService
 
         return [$daily, $keys, $labels];
     }
+
+    /** প্ল্যানে সুবিধাটা চালু আছে কি না */
+    public function planAllows(Farm $farm, string $feature): bool
+    {
+        $farm->loadMissing('subscription.plan');
+        $plan = $farm->subscription?->plan;
+
+        return (bool) ($plan && $plan->allows($feature));
+    }
+
+    /** গরুভিত্তিক রিপোর্টের ফিল্টার ও সাজানো (পাতা ও export দুটোতেই একই নিয়ম) */
+    public function cowRows(array $report, mixed $status = null, mixed $sort = null): array
+    {
+        $status = in_array($status, ['all', 'active', 'sold', 'gone'], true) ? $status : 'all';
+        $sort = in_array($sort, ['result_desc', 'result_asc', 'tag'], true) ? $sort : 'result_desc';
+
+        $rows = collect($report['rows'])->filter(fn($r) => match ($status) {
+            'active' => $r['cow']->status === 'active',
+            'sold' => $r['cow']->status === 'sold',
+            'gone' => in_array($r['cow']->status, ['dead', 'transferred'], true),
+            default => true,
+        });
+
+        $rows = match ($sort) {
+            'result_asc' => $rows->sortBy(fn($r) => $r['result']),
+            'tag' => $rows->sortBy(fn($r) => $r['cow']->tag_number, SORT_NATURAL),
+            default => $rows->sortByDesc(fn($r) => $r['result']),
+        };
+
+        return ['rows' => $rows->values()->all(), 'status' => $status, 'sort' => $sort];
+    }
 }

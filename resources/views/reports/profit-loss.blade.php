@@ -31,6 +31,7 @@
         <div class="d-flex gap-2 no-print">
             <a href="{{ route('farms.reports.index', $farm) }}" class="btn btn-outline-secondary"><i
                     class="bi bi-arrow-left me-1"></i>সব রিপোর্ট</a>
+            @include('reports._export', ['report' => 'profit-loss'])
             <button type="button" class="btn btn-outline-primary" onclick="window.print()"><i
                     class="bi bi-printer me-1"></i>প্রিন্ট</button>
         </div>
