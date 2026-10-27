@@ -8,14 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Concerns\Auditable;
 
 class Cow extends Model
 {
-    use BelongsToFarm, HasFactory, SoftDeletes;
+    use BelongsToFarm, HasFactory, SoftDeletes, Auditable;
 
     public const SOURCE_MANUAL = 'manual';
     public const STATUS_ACTIVE = 'active';
     public const STATUS_SOLD = 'sold';
+
+    protected array $auditOnly = ['tag_number', 'name', 'category', 'sex', 'breed', 'status', 'acquisition_type', 'purchase_price', 'purchase_date', 'opening_value', 'birth_date', 'exit_date'];
 
     // farm_id, created_by, source ইচ্ছে করে এখানে নেই: server নিজে বসাবে
     protected $fillable = [

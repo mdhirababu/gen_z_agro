@@ -53,6 +53,7 @@ class User extends Authenticatable
     public function farms(): BelongsToMany
     {
         return $this->belongsToMany(Farm::class)
+            ->using(\App\Models\FarmMember::class)
             ->withPivot('role')
             ->withTimestamps();
     }

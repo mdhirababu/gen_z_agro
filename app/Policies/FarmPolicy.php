@@ -64,4 +64,10 @@ class FarmPolicy
     {
         return $farm->roleOf($user) === Farm::ROLE_OWNER;
     }
+
+    /** অডিট লগ দেখা: শুধু মালিক */
+    public function viewAudit(User $user, Farm $farm): bool
+    {
+        return $farm->roleOf($user) === Farm::ROLE_OWNER;
+    }
 }

@@ -61,33 +61,15 @@ class ReportController extends Controller
 
         $period = ReportPeriod::fromRequest($request);
         $report = $reports->cowProfitability($farm, $period);
-
-        $status = (string) $request->query('status', 'all');
-        $status = in_array($status, ['all', 'active', 'sold', 'gone'], true) ? $status : 'all';
-
-        $sort = (string) $request->query('sort', 'result_desc');
-        $sort = in_array($sort, ['result_desc', 'result_asc', 'tag'], true) ? $sort : 'result_desc';
-
-        $rows = collect($report['rows'])->filter(fn($r) => match ($status) {
-            'active' => $r['cow']->status === 'active',
-            'sold' => $r['cow']->status === 'sold',
-            'gone' => in_array($r['cow']->status, ['dead', 'transferred'], true),
-            default => true,
-        });
-
-        $rows = match ($sort) {
-            'result_asc' => $rows->sortBy(fn($r) => $r['result']),
-            'tag' => $rows->sortBy(fn($r) => $r['cow']->tag_number, SORT_NATURAL),
-            default => $rows->sortByDesc(fn($r) => $r['result']),
-        };
+        $view = $reports->cowRows($report, $request->query('status'), $request->query('sort'));
 
         return view('reports.cows', [
             'farm' => $farm,
             'period' => $period,
             'report' => $report,
-            'rows' => $rows->values()->all(),
-            'status' => $status,
-            'sort' => $sort,
+            'rows' => $view['rows'],
+            'status' => $view['status'],
+            'sort' => $view['sort'],
         ]);
     }
 
