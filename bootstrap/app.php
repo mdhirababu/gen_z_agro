@@ -16,6 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'farm.subscription' => \App\Http\Middleware\EnsureActiveSubscription::class,
             'super.admin' => \App\Http\Middleware\EnsureSuperAdmin::class,
         ]);
+
+        $middleware->appendToGroup('web', [
+            \App\Http\Middleware\SecurityHeaders::class,
+            \App\Http\Middleware\ThrottleAuthForms::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

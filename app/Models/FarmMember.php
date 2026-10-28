@@ -11,6 +11,8 @@ class FarmMember extends Pivot
 
     protected $table = 'farm_user';
 
+    public $incrementing = true;
+
     protected array $auditOnly = ['user_id', 'role'];
 
     public function auditLabel(): string

@@ -59,5 +59,6 @@
                 এখনো অ্যাকাউন্ট নেই? <a href="{{ route('register') }}">নতুন অ্যাকাউন্ট খুলুন</a>
             </div>
         @endif
+        <a href="{{ route('privacy') }}">গোপনীয়তা নীতি</a> · <a href="{{ route('terms') }}">শর্তাবলী</a>
     </div>
 @endsection

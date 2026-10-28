@@ -60,7 +60,7 @@ class CowController extends Controller
             ]);
 
             if ($request->hasFile('photo')) {
-                $cow->photo_path = $request->file('photo')->store("cows/{$farm->id}", 'public');
+                $cow->photo_path = app(\App\Services\ImageSanitizer::class)->store($request->file('photo'), "cows/{$farm->id}");
             }
 
             $cow->save();
@@ -180,10 +180,13 @@ class CowController extends Controller
             }
 
             if ($request->hasFile('photo')) {
+                $newPath = app(\App\Services\ImageSanitizer::class)->store($request->file('photo'), "cows/{$farm->id}");
+
                 if ($cow->photo_path) {
                     Storage::disk('public')->delete($cow->photo_path);
                 }
-                $cow->photo_path = $request->file('photo')->store("cows/{$farm->id}", 'public');
+
+                $cow->photo_path = $newPath;
             }
 
             $cow->save();

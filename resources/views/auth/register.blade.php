@@ -74,5 +74,6 @@
                 আগে থেকেই অ্যাকাউন্ট আছে? <a href="{{ route('login') }}">লগইন করুন</a>
             </div>
         @endif
+        <a href="{{ route('privacy') }}">গোপনীয়তা নীতি</a> · <a href="{{ route('terms') }}">শর্তাবলী</a>
     </div>
 @endsection

@@ -12,6 +12,10 @@
             'voided' => 'red',
             'restored' => 'green',
             'exported' => 'gray',
+            'login' => 'green',
+            'login_failed' => 'orange',
+            'lockout' => 'red',
+            'password_reset' => 'blue',
         ];
     @endphp
 

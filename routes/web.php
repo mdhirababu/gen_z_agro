@@ -3,12 +3,14 @@
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\PlanController as AdminPlanController;
+use App\Http\Controllers\AdminAuditController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\BreedingController;
 use App\Http\Controllers\CowController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DataExportController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FarmController;
 use App\Http\Controllers\FarmMemberController;
@@ -25,6 +27,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Auth::routes();
+
+Route::view('/privacy', 'legal.privacy')->name('privacy');
+Route::view('/terms', 'legal.terms')->name('terms');
 
 Route::get('/', fn() => auth()->check()
     ? redirect()->route('farms.index')
@@ -166,11 +171,16 @@ Route::middleware('auth')->group(function () {
                 ->middleware('throttle:20,1');
             // অডিট লগ: শুধু মালিক (controller-এ যাচাই হয়)
             Route::get('audit', [AuditController::class, 'index'])->name('audit.index');
+            // নিজের খামারের সব ডেটা নামানো (মালিক; মেয়াদ শেষেও চলে, তাই GET)
+            Route::get('data-export', [DataExportController::class, 'show'])->name('data-export.show');
+            Route::get('data-export/download', [DataExportController::class, 'download'])
+                ->name('data-export.download')
+                ->middleware('throttle:3,60');
         });
     });
 
     // Super Admin প্যানেল
-    Route::middleware('super.admin')->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware(['super.admin', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/', [AdminDashboardController::class, 'index'])->name('index');
 
         Route::get('payments', [AdminPaymentController::class, 'index'])->name('payments.index');
@@ -182,5 +192,7 @@ Route::middleware('auth')->group(function () {
         Route::get('plans', [AdminPlanController::class, 'index'])->name('plans.index');
         Route::get('plans/{plan}/edit', [AdminPlanController::class, 'edit'])->name('plans.edit');
         Route::put('plans/{plan}', [AdminPlanController::class, 'update'])->name('plans.update');
+
+        Route::get('audit', [AdminAuditController::class, 'index'])->name('audit.index');
     });
 });
