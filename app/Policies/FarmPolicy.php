@@ -76,4 +76,10 @@ class FarmPolicy
     {
         return $farm->roleOf($user) === Farm::ROLE_OWNER;
     }
+
+    /** গরুর তালিকা ইমপোর্ট: মালিক ও ম্যানেজার */
+    public function importCows(User $user, Farm $farm): bool
+    {
+        return in_array($farm->roleOf($user), [Farm::ROLE_OWNER, Farm::ROLE_MANAGER], true);
+    }
 }

@@ -8,6 +8,7 @@ use App\Http\Controllers\AuditController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\BreedingController;
 use App\Http\Controllers\CowController;
+use App\Http\Controllers\CowImportController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataExportController;
@@ -67,6 +68,19 @@ Route::middleware('auth')->group(function () {
             Route::get('milk', [MilkController::class, 'index'])->name('milk.index');
             Route::get('milk/entry', [MilkController::class, 'entry'])->name('milk.entry');
             Route::post('milk/entry', [MilkController::class, 'save'])->name('milk.save');
+
+            // গরুর তালিকা ইমপোর্ট (মালিক ও ম্যানেজার): অবশ্যই cows/{cow}-এর আগে
+            Route::get('cows/import', [CowImportController::class, 'create'])->name('cows.import');
+            Route::get('cows/import/template', [CowImportController::class, 'template'])->name('cows.import.template');
+            Route::post('cows/import', [CowImportController::class, 'upload'])
+                ->name('cows.import.upload')
+                ->middleware('throttle:10,1');
+            Route::get('cows/import/{token}', [CowImportController::class, 'preview'])
+                ->name('cows.import.preview')
+                ->where('token', '[A-Za-z0-9]{40}');
+            Route::post('cows/import/{token}', [CowImportController::class, 'store'])
+                ->name('cows.import.store')
+                ->where('token', '[A-Za-z0-9]{40}');
 
             // গরু ও ওজন: scopeBindings থাকায় {cow} অবশ্যই এই খামারের হতে হবে, নইলে 404
             Route::scopeBindings()->group(function () {

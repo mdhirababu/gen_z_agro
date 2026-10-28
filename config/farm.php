@@ -132,4 +132,10 @@ return [
         'feed' => 'feed_records',   // feed_records (খাবারের রেকর্ড), cow_days (গরু-দিন), equal (সমান ভাগ)
         'other' => 'cow_days',      // cow_days (গরু-দিন), equal (সমান ভাগ)
     ],
+
+    // গরুর তালিকা ইমপোর্টের সীমা
+    'import' => [
+        'max_rows' => 500,
+        'max_kb' => 2048,
+    ],
 ];
