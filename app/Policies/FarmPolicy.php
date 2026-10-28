@@ -70,4 +70,10 @@ class FarmPolicy
     {
         return $farm->roleOf($user) === Farm::ROLE_OWNER;
     }
+
+    /** খামারের সব ডেটা নামানো: শুধু মালিক */
+    public function exportData(User $user, Farm $farm): bool
+    {
+        return $farm->roleOf($user) === Farm::ROLE_OWNER;
+    }
 }

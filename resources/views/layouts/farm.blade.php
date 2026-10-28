@@ -130,6 +130,11 @@
                         <a class="sb-link {{ request()->routeIs('farms.audit.*') ? 'active' : '' }}" title="অডিট লগ"
                             href="{{ route('farms.audit.index', $currentFarm) }}"><i class="bi bi-journal-text"></i><span
                                 class="sb-label">অডিট লগ</span></a>
+                        @if (isset($currentFarm) && auth()->user()->can('exportData', $currentFarm))
+                            <a class="sb-link {{ request()->routeIs('farms.data-export.*') ? 'active' : '' }}"
+                                title="ডেটা এক্সপোর্ট" href="{{ route('farms.data-export.show', $currentFarm) }}"><i
+                                    class="bi bi-box-arrow-down"></i><span class="sb-label">ডেটা এক্সপোর্ট</span></a>
+                        @endif
                     @endcan
                     @can('update', $currentFarm)
                         <a class="sb-link {{ request()->routeIs('farms.edit') ? 'active' : '' }}" title="খামারের সেটিংস"
@@ -154,6 +159,9 @@
                     <a class="sb-link {{ request()->routeIs('admin.plans.*') ? 'active' : '' }}" title="প্ল্যান"
                         href="{{ route('admin.plans.index') }}"><i class="bi bi-layers"></i><span
                             class="sb-label">প্ল্যান</span></a>
+                    <a class="sb-link {{ request()->routeIs('admin.audit.*') ? 'active' : '' }}" title="অডিট লগ"
+                        href="{{ route('admin.audit.index') }}"><i class="bi bi-journal-text"></i><span
+                            class="sb-label">অডিট লগ</span></a>
                 @endif
             </nav>
         </aside>
