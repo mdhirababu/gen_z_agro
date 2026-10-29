@@ -40,6 +40,8 @@
         </div>
     </section>
 
+    @include('dashboard._onboarding')
+
     {{-- ===== KPI ===== --}}
     <div class="row g-3 mb-3">
         <div class="col-6 {{ $canFinance ? 'col-xl-3' : 'col-xl-6' }}">
@@ -325,8 +327,7 @@
                 </div>
             </div>
         @endif
-
-        @if ($checklist->isNotEmpty() && !$checklistDone)
+        {{-- @if ($checklist->isNotEmpty() && !$checklistDone)
             <div class="col-lg-6">
                 <div class="panel h-100">
                     <div class="panel-head">শুরু করুন</div>
@@ -342,6 +343,6 @@
                     </div>
                 </div>
             </div>
-        @endif
+        @endif --}}
     </div>
 @endsection

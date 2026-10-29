@@ -596,6 +596,10 @@ body { -webkit-font-smoothing: antialiased; }
     background: transparent;
     color: #8a9c93;
 
+    /* এই দুই লাইন যোগ করুন */
+    display: grid !important; 
+    place-items: center !important;
+
     &:hover { background: $brand-soft; color: $brand-dark; }
   }
 }

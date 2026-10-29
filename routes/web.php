@@ -19,6 +19,7 @@ use App\Http\Controllers\FeedController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\MilkController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReportExportController;
@@ -190,6 +191,10 @@ Route::middleware('auth')->group(function () {
             Route::get('data-export/download', [DataExportController::class, 'download'])
                 ->name('data-export.download')
                 ->middleware('throttle:3,60');
+
+            // শুরুর গাইড লুকানো ও আবার দেখানো (প্রত্যেক সদস্যের নিজের জন্য)
+            Route::post('onboarding/dismiss', [OnboardingController::class, 'dismiss'])->name('onboarding.dismiss');
+            Route::post('onboarding/restore', [OnboardingController::class, 'restore'])->name('onboarding.restore');
         });
     });
 
