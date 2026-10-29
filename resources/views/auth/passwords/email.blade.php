@@ -1,47 +1,44 @@
 @extends('layouts.app')
+@section('title', 'পাসওয়ার্ড রিসেট')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Reset Password') }}</div>
+    <div class="auth-panel">
+        <h2 class="auth-title">পাসওয়ার্ড রিসেট করুন</h2>
+        <p class="auth-sub">আপনার ইমেইল অ্যাড্রেসটি দিন, আমরা আপনাকে একটি পাসওয়ার্ড রিসেট লিংক পাঠিয়ে দেব।</p>
 
-                <div class="card-body">
-                    @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
-
-                    <form method="POST" action="{{ route('password.email') }}">
-                        @csrf
-
-                        <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
-
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Send Password Reset Link') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+        @if (session('status'))
+            <div class="alert alert-success mb-4" role="alert" style="font-size: 0.9rem; border-radius: 0.75rem;">
+                {{ session('status') }}
             </div>
+        @endif
+
+        <form method="POST" action="{{ route('password.email') }}">
+            @csrf
+
+            {{-- ইমেইল ফিল্ড --}}
+            <div class="field">
+                <label for="email" class="form-label">ইমেইল অ্যাড্রেস</label>
+                <div class="field-control">
+                    <i class="bi bi-envelope lead-ic"></i>
+                    <input id="email" type="email" name="email" value="{{ old('email') }}"
+                        class="form-control @error('email') is-invalid @enderror" placeholder="name@example.com" required
+                        autocomplete="email" autofocus>
+                </div>
+                @error('email')
+                    <div class="field-error">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <button type="submit" class="btn btn-primary auth-btn mt-2">
+                রিসেট লিংক পাঠান
+            </button>
+        </form>
+
+        {{-- লগইন পেজে ফেরার লিংক --}}
+        <div class="auth-alt"
+            style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid #e5e7eb; text-align: center; font-size: 0.95rem; color: #6b7280;">
+            মনে পড়ে গেছে? <a href="{{ route('login') }}"
+                style="color: #1a7f4b; font-weight: 600; text-decoration: none;">লগইনে ফিরে যান</a>
         </div>
     </div>
-</div>
 @endsection

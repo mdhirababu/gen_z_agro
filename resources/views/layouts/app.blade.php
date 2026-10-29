@@ -8,6 +8,8 @@
 
     {{-- Favicon --}}
     <link rel="icon" type="image/x-icon" href="{{ asset('image/favicon.ico') }}">
+    {{-- 🔥 Bootstrap Icons যোগ করুন (এটি ছাড়া আইকন কাজ করবে না) --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     {{-- Auth page brand/logo styles --}}
     <style>

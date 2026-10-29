@@ -15,7 +15,8 @@
                 <div class="field-control">
                     <i class="bi bi-person lead-ic"></i>
                     <input id="name" type="text" name="name" value="{{ old('name') }}"
-                        class="form-control @error('name') is-invalid @enderror" required autocomplete="name" autofocus>
+                        class="form-control @error('name') is-invalid @enderror" placeholder="আপনার পূর্ণ নাম লিখুন"
+                        required autocomplete="name" autofocus>
                 </div>
                 @error('name')
                     <div class="field-error">{{ $message }}</div>
@@ -42,8 +43,8 @@
                     <div class="field-control has-toggle">
                         <i class="bi bi-lock lead-ic"></i>
                         <input id="password" name="password" type="password" :type="show ? 'text' : 'password'"
-                            class="form-control @error('password') is-invalid @enderror" required
-                            autocomplete="new-password">
+                            class="form-control @error('password') is-invalid @enderror"
+                            placeholder="কমপক্ষে ৮ অক্ষরের পাসওয়ার্ড" required autocomplete="new-password">
                         <button type="button" class="toggle" @click="show = !show"
                             :aria-label="show ? 'পাসওয়ার্ড লুকান' : 'পাসওয়ার্ড দেখান'">
                             <i class="bi" :class="show ? 'bi-eye-slash' : 'bi-eye'"></i>
@@ -61,7 +62,8 @@
                     <div class="field-control">
                         <i class="bi bi-shield-lock lead-ic"></i>
                         <input id="password-confirm" name="password_confirmation" type="password"
-                            :type="show ? 'text' : 'password'" class="form-control" required autocomplete="new-password">
+                            :type="show ? 'text' : 'password'" class="form-control"
+                            placeholder="উপরের পাসওয়ার্ডটি আবার লিখুন" required autocomplete="new-password">
                     </div>
                 </div>
             </div>
@@ -74,6 +76,23 @@
                 আগে থেকেই অ্যাকাউন্ট আছে? <a href="{{ route('login') }}">লগইন করুন</a>
             </div>
         @endif
-        <a href="{{ route('privacy') }}">গোপনীয়তা নীতি</a> · <a href="{{ route('terms') }}">শর্তাবলী</a>
+
+        {{-- ঠিক করা ফুটার লিংক (ইনলাইন CSS) --}}
+        <div
+            style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; text-align: center; font-size: 0.85rem; color: #6b7280; display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
+            <a href="{{ route('privacy') }}"
+                style="color: #6b7280; text-decoration: none; font-weight: 500; transition: color 0.2s ease;"
+                onmouseover="this.style.color='#1a7f4b'; this.style.textDecoration='underline';"
+                onmouseout="this.style.color='#6b7280'; this.style.textDecoration='none';">
+                গোপনীয়তা নীতি
+            </a>
+            <span style="color: #d1d5db; font-size: 0.9rem;">·</span>
+            <a href="{{ route('terms') }}"
+                style="color: #6b7280; text-decoration: none; font-weight: 500; transition: color 0.2s ease;"
+                onmouseover="this.style.color='#1a7f4b'; this.style.textDecoration='underline';"
+                onmouseout="this.style.color='#6b7280'; this.style.textDecoration='none';">
+                শর্তাবলী
+            </a>
+        </div>
     </div>
 @endsection

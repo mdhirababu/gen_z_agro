@@ -45,12 +45,17 @@
                     <p>খোঁজা বা ফিল্টার বদলে আবার দেখুন।</p>
                 @else
                     <h2>এখনো কোনো গরু নেই</h2>
-                    <p>প্রথম গরু বা বাছুরটি যোগ করে শুরু করুন।</p>
+                    <p>একটা একটা করে যোগ করুন, অথবা অনেক গরু থাকলে Excel থেকে একবারে তুলে নিন।</p>
                     @if ($canCreate)
                         <a href="{{ route('farms.cows.create', $farm) }}" class="btn btn-primary">
                             <i class="bi bi-plus-lg me-1"></i>নতুন গরু যোগ করুন
                         </a>
                     @endif
+                    @can('importCows', $farm)
+                        <a href="{{ route('farms.cows.import', $farm) }}" class="btn btn-outline-primary ms-1">
+                            <i class="bi bi-file-earmark-excel me-1"></i>Excel থেকে ইমপোর্ট
+                        </a>
+                    @endcan
                 @endif
             </div>
         </div>

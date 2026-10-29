@@ -180,6 +180,8 @@ class DashboardController extends Controller
 
         $data['checklist'] = $checklist;
         $data['checklistDone'] = $checklist->every(fn($item) => $item['done']);
+        // ---- শুরুর গাইড (ধাপ, অগ্রগতি, লুকানো) ----
+        $data['onboarding'] = app(\App\Services\OnboardingService::class)->for($farm, $user);
 
         return view('dashboard', $data);
     }
